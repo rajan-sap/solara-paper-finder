@@ -1,0 +1,12 @@
+[project]
+name = "solara-paper-finder"
+version = "0.1.0"
+description = "A web application for finding and exploring academic papers, built with Solara"
+requires-python = ">=3.13"
+dependencies = [
+    "arxiv>=2.3.0",
+    "numpy>=2.3.4",
+    "pandas>=2.3.3",
+    "requests>=2.32.5",
+    "solara>=1.54.0",
+]

@@ -1,10 +1,10 @@
-# Solara Paper Finder
+# Paper Finder
 
-A web application for finding and exploring academic papers, built with Solara.
+A web application for finding and exploring academic papers, built with Solara - a react like framework on top to python to build interactive web projects.
 
 ## Features
 
-- Search academic papers
+- Search academic papers 
 - Filter and sort results
 - Interactive UI powered by Solara
 
@@ -18,23 +18,26 @@ A web application for finding and exploring academic papers, built with Solara.
    cd solara-paper-finder
    ```
 
-2. **Create a virtual environment**
+2. **Install dependencies with uv**
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   # Install uv if you haven't already
+   pip install uv
+   
+   # Sync dependencies (creates .venv automatically)
+   uv sync
    ```
 
-3. **Install dependencies**
+3. **Run the application**
    ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Run the application**
-   ```bash
+   # Using uv to run in the virtual environment
+   uv run solara run app.py
+   
+   # Or activate the virtual environment first
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
    solara run app.py
    ```
 
-5. **Open in browser**
+4. **Open in browser**
    Navigate to `http://localhost:8765`
 
 ## Project Structure
@@ -43,7 +46,8 @@ A web application for finding and exploring academic papers, built with Solara.
 solara-paper-finder/
 │
 ├── app.py           # Main Solara app
-├── requirements.txt # All Python dependencies
+├── pyproject.toml   # Project config and dependencies
+├── uv.lock          # Locked dependency versions
 ├── README.md        # Project info and setup guide
 ├── .gitignore       # Ignore files for Git
 └── data/            # (optional) Cache or results if needed
@@ -52,7 +56,8 @@ solara-paper-finder/
 ## Technologies
 
 - [Solara](https://solara.dev/) - Reactive web framework
-- Python 3.11+
+- [uv](https://docs.astral.sh/uv/) - Fast Python package manager
+- Python 3.13+
 
 ## License
 
