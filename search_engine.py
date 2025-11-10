@@ -6,9 +6,11 @@ ranking criteria for each data source.
 """
 
 import arxiv
-from typing import List, Dict, Any
+import requests
+from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 from datetime import datetime
+import time
 
 
 @dataclass
@@ -65,31 +67,94 @@ class Paper:
         }
 
 
+def get_citation_count_from_semantic_scholar(arxiv_id: str) -> Optional[int]:
+    """
+    Fetch citation count from Semantic Scholar API for an arXiv paper.
+    
+    Semantic Scholar is maintained by the Allen Institute for AI and provides
+    reliable citation data aggregated from multiple sources.
+    
+    Args:
+        arxiv_id: arXiv ID (e.g., "2301.12345" or full URL)
+    
+    Returns:
+        Citation count or None if not found
+    """
+    try:
+        # Extract just the ID if full URL provided
+        if 'arxiv.org' in arxiv_id:
+            arxiv_id = arxiv_id.split('/')[-1]
+        
+        # Remove version number if present (e.g., "2301.12345v2" -> "2301.12345")
+        arxiv_id = arxiv_id.split('v')[0]
+        
+        # Semantic Scholar API endpoint
+        url = f"https://api.semanticscholar.org/graph/v1/paper/arXiv:{arxiv_id}"
+        params = {"fields": "citationCount,title"}
+        
+        response = requests.get(url, params=params, timeout=5)
+        
+        if response.status_code == 200:
+            data = response.json()
+            return data.get('citationCount', 0)
+        elif response.status_code == 404:
+            # Paper not found in Semantic Scholar database
+            return None
+        else:
+            return None
+    except Exception as e:
+        # Fail gracefully - don't break search if citation lookup fails
+        return None
+
+
 class ArxivSearchEngine:
     """
     arXiv Search Engine
     
-    RANKING CRITERIA DOCUMENTATION:
-    ================================
+    WHAT ARXIV API PROVIDES:
+    =========================
+    ✓ Paper metadata:
+      - Title, authors (name only, no affiliations in structured format)
+      - Abstract (full text)
+      - Published date and last updated date
+      - Primary category and all categories (e.g., cs.AI, math.CO)
+      
+    ✓ URLs and identifiers:
+      - arXiv entry ID and URL (e.g., http://arxiv.org/abs/2301.12345)
+      - PDF download URL
+      - DOI (if paper is published in journal)
+      - Journal reference (if available)
+      
+    ✓ Additional fields:
+      - Comment field (may contain affiliations, funding info, page counts)
+      - Author list with individual author objects
+      
+    ✗ WHAT ARXIV API DOES NOT PROVIDE:
+    ===================================
+    ✗ Citation counts - Not tracked by arXiv
+    ✗ Impact factors - Preprint server, not journal
+    ✗ Structured affiliation data - Only available in comment field as free text
+    ✗ Peer review status - arXiv hosts preprints
+    ✗ Full-text search - Only searches titles and abstracts
+    ✗ Author h-index or metrics
     
+    CITATION DATA SOURCE:
+    =====================
+    📊 Citation counts fetched from Semantic Scholar API
+       - Maintained by Allen Institute for AI
+       - Most trusted source for academic citation data
+       - Aggregates from multiple databases
+       - Free API with reasonable rate limits
+    
+    RANKING CRITERIA:
+    =================
     1. SORT METHODS:
-       - Relevance: Papers ranked by arXiv's internal relevance algorithm
-         (considers title/abstract keyword matching, citation patterns)
+       - Relevance: arXiv's algorithm (title/abstract keyword matching)
        - Submitted Date: Most recently submitted papers first
        - Last Updated: Most recently updated papers first
     
-    2. FILTERS:
-       - Max Results: Limits number of papers returned (default: 20)
-       - Date Range: Can filter by publication date (optional)
-       
-    3. RELEVANCE SCORE:
-       - Provided by arXiv API based on query match quality
-       - Range: 0.0 to 1.0 (higher = more relevant)
-       
-    4. LIMITATIONS:
-       - Citation counts not available in arXiv API
-       - No journal impact factor data
-       - Preprints may not be peer-reviewed
+    2. RELEVANCE SCORE:
+       - Calculated based on query match quality (0.0-1.0, higher = more relevant)
     """
     
     def __init__(self):
@@ -98,7 +163,7 @@ class ArxivSearchEngine:
     def search(
         self,
         query: str,
-        max_results: int = 20,
+        max_results: int = 10,
         sort_by: str = "relevance"
     ) -> tuple[List[Paper], RankingCriteria]:
         """
@@ -171,6 +236,14 @@ class ArxivSearchEngine:
                     if author.affiliation not in affiliations:
                         affiliations.append(author.affiliation)
             
+            # Fetch citation count from Semantic Scholar (most trusted source)
+            citation_count = get_citation_count_from_semantic_scholar(result.entry_id)
+            if citation_count is None:
+                citation_count = 0  # Default to 0 if not found
+            
+            # Small delay to respect API rate limits (100 requests/5 minutes for Semantic Scholar)
+            time.sleep(0.1)
+            
             paper = Paper(
                 title=result.title,
                 authors=[author.name for author in result.authors],
@@ -179,7 +252,7 @@ class ArxivSearchEngine:
                 url=result.entry_id,
                 pdf_url=result.pdf_url,
                 source="arXiv",
-                citation_count=0,  # Not available in arXiv API
+                citation_count=citation_count,  # Fetched from Semantic Scholar API (Allen Institute for AI)
                 relevance_score=relevance,
                 affiliations=affiliations[:3] if affiliations else []  # Limit to top 3
             )
