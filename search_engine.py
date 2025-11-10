@@ -1,5 +1,5 @@
 """
-Paper Search Engine Module
+Research Paper Search Engine Module
 
 This module provides transparent paper search functionality with explicitly documented
 ranking criteria for each data source.
@@ -43,6 +43,12 @@ class Paper:
     pdf_url: str = ""
     citation_count: int = 0
     relevance_score: float = 0.0
+    affiliations: List[str] = None  # Author affiliations/institutions
+    
+    def __post_init__(self):
+        """Initialize optional fields"""
+        if self.affiliations is None:
+            self.affiliations = []
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for display"""
@@ -139,6 +145,32 @@ class ArxivSearchEngine:
             # Calculate a simple relevance score based on position (1.0 for first, decreasing)
             relevance = 1.0 - (idx / max_results) if max_results > 0 else 0.0
             
+            # Extract affiliations from email domains
+            affiliations = []
+            seen_domains = set()
+            
+            # Check if result has comment field which often contains contact info
+            if hasattr(result, 'comment') and result.comment:
+                # Extract email domains from comment
+                import re
+                email_pattern = r'[\w\.-]+@([\w\.-]+\.\w+)'
+                emails = re.findall(email_pattern, result.comment)
+                for domain in emails:
+                    if domain not in seen_domains:
+                        # Convert domain to organization name (e.g., mit.edu -> MIT)
+                        org_name = domain.split('.')[0].upper() if '.' in domain else domain.upper()
+                        # Better formatting for known domains
+                        if 'edu' in domain:
+                            org_name = domain.split('.')[0].replace('-', ' ').title()
+                        affiliations.append(org_name)
+                        seen_domains.add(domain)
+            
+            # Also check authors for affiliation attribute
+            for author in result.authors:
+                if hasattr(author, 'affiliation') and author.affiliation:
+                    if author.affiliation not in affiliations:
+                        affiliations.append(author.affiliation)
+            
             paper = Paper(
                 title=result.title,
                 authors=[author.name for author in result.authors],
@@ -148,7 +180,8 @@ class ArxivSearchEngine:
                 pdf_url=result.pdf_url,
                 source="arXiv",
                 citation_count=0,  # Not available in arXiv API
-                relevance_score=relevance
+                relevance_score=relevance,
+                affiliations=affiliations[:3] if affiliations else []  # Limit to top 3
             )
             papers.append(paper)
         
