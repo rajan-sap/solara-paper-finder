@@ -87,16 +87,16 @@ def SearchBar(search_query, on_search, is_searching, selected_database, ranking_
                 value=search_query.value,
                 on_value=search_query.set,
                 style={
+                    "flex": "1",
                     "border": "none",
                     "box-shadow": "none",
-                    "background": "#f8fafc",
-                    "font-size": "1.18rem",
-                    "padding": "18px 18px 18px 18px",
+                    "height": "58px",
                     "border-radius": "10px 0 0 10px",
-                    "min-width": "0",
-                    "flex": 1
-                }
-            )
+                    "background": "#fff",
+                    "font-size": "1.1rem",
+                    "padding": "16px 5px 0 16px",
+                })
+
             solara.Button(
                 label="Search",
                 icon_name="mdi-magnify",
@@ -116,41 +116,6 @@ def SearchBar(search_query, on_search, is_searching, selected_database, ranking_
                     "height": "48px"
                 }
             )
-        #    # Ranking dropdown
-        #     ranking_options = [
-        #         ("AI ranking", "AI Ranking"),
-        #         ("relevance", "Relevance"),
-        #         ("citations", "Citations"),
-        #         ("submittedDate", "Date (Submitted)")
-        #     ]
-        #     display_values = [label for value, label in ranking_options]
-        #     value_map = {label: value for value, label in ranking_options}
-        #     current_label = next((label for value, label in ranking_options if value == (ranking_criteria.value or "relevance")), "Relevance")
-        #     def on_ranking_change(label):
-        #         ranking_criteria.set(value_map[label])
-        #     solara.Select(
-        #         label="Ranking",
-        #         value=current_label,
-        #         values=display_values,
-        #         on_value=on_ranking_change,
-        #         style={
-        #             "border-radius": "10px",
-        #             "background": "#f1f5f9",
-        #             "font-size": "1.08rem",
-        #             "border": "1.5px solid #cbd5e1",
-        #             "transition": "background 0.18s, color 0.18s"
-                    
-        #         }
-        #     )
-        #     solara.HTML(unsafe_innerHTML="""
-        #     <style>
-        #     .solara-select__option:hover, .solara-select__option[aria-selected="true"] {
-        #         background: #f1f5f9 !important;
-        #         color: #f1f5f9  !important;
-        #         border-radius: 8px !important;
-        #     }
-        #     </style>
-        #     """)
 
         # Third row: Example search tokens
         with solara.Row(style={

@@ -17,7 +17,7 @@ def NavBar():
         # Logo
         solara.HTML(
             tag="div",
-            unsafe_innerHTML="<span style='font-size:2.1rem;font-weight:800;color:#2563eb;vertical-align:middle;'>📚 Paper Finder</span>",
+            unsafe_innerHTML="<span style='font-size:2.1rem;font-weight:800;color:#2563eb;vertical-align:middle;'>📚 TopRead</span>",
             style={"display": "flex", "align-items": "center"}
         )
         # Navigation text labels
@@ -47,18 +47,19 @@ def HeroHeader():
     }):
         solara.HTML(
             tag="h1",
-            unsafe_innerHTML="📚 Paper Finder",
+            unsafe_innerHTML="Reading list favored by top researchers worldwide!",
+  
             style={
-                "font-size": "4rem",
+                "font-size": "3rem",
                 "margin-bottom": "20px",
                 "color": "#1e293b",
                 "font-weight": "800",
-                "letter-spacing": "-0.02em"
+                "letter-spacing": "-0.02em",
             }
         )
         solara.HTML(
             tag="p",
-            unsafe_innerHTML="<em>Discover, explore, and organize academic papers with transparent ranking and real-time citations</em>",
+            unsafe_innerHTML="<em>Discover the most influential research papers—highly ranked and widely acclaimed by leading experts.</em>",
             style={
                 "font-size": "1.4rem", 
                 "color": "#475569", 

@@ -16,5 +16,5 @@ def Footer():
     }):
         solara.HTML(
             tag="footer",
-            unsafe_innerHTML="&copy; 2025 Paper Finder. Made for you who love reading, learning, and growing. <span style='color:#60a5fa'>&#10084;</span> ",
+            unsafe_innerHTML="&copy; 2025 TopRead. Made to deliver the top read. <span style='color:#60a5fa'>&#10084;</span> ",
         )
