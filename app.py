@@ -41,7 +41,7 @@ visible_results_count = solara.reactive(5)  # Number of results to display
 
 @solara.component
 def Page():
-    """Main paper finder application"""
+    """Main application"""
     
     # Add custom CSS for enhanced animations (optional, can be moved to a static file)
     solara.HTML(unsafe_innerHTML="""
@@ -96,7 +96,6 @@ def Page():
 
             if len(search_results.value) > visible_results_count.value:
                 pass  # ...existing code for load more button...
-
                 with solara.Row(style={"justify-content": "center", "margin-top": "20px"}):
                     solara.Button(
                         label="Load More Results",

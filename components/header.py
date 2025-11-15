@@ -22,7 +22,7 @@ def NavBar():
         )
         # Navigation text labels
         with solara.Row(style={
-            "gap": "28px",
+            "gap": "24px",
             "align-items": "center",
             "margin-left": "auto",
             "background": "#e0e7ff",
